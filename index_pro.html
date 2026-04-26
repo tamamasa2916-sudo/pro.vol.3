@@ -872,7 +872,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw_pro.js', { scope: '/' }).then(function(reg) {
+    navigator.serviceWorker.register('/pro.vol.3/sw_pro.js', { scope: '/pro.vol.3/' }).then(function(reg) {
       console.log('[PWA] Service Worker 登録完了:', reg.scope);
       reg.onupdatefound = function() {
         var newWorker = reg.installing;

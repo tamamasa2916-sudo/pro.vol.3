@@ -4,8 +4,8 @@
    ===================================================== */
 var CACHE_NAME = 'teiki-pro-v1';
 var ASSETS = [
-  '/index_pro.html',
-  '/manifest_pro.json'
+  '/pro.vol.3/index_pro.html',
+  '/pro.vol.3/manifest_pro.json'
 ];
 
 /* インストール：キャッシュに登録 */
@@ -45,7 +45,7 @@ self.addEventListener('fetch', function(e) {
         return res;
       });
     }).catch(function() {
-      return caches.match('/index_pro.html');
+      return caches.match('/pro.vol.3/index_pro.html');
     })
   );
 });
