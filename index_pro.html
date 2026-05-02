@@ -375,6 +375,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
   #sw-update-banner,#reset-dialog,#pdf-guide,
   #validation-banner{display:none!important}
   #print-only{display:block!important}
+  #pt-sheet-copy{display:block!important;margin-top:8px}
   .amount{-webkit-text-fill-color:#1a5fa8!important;background:none!important;font-size:30pt!important}
   .unit{-webkit-text-fill-color:#555!important}
   .copay-note{-webkit-text-fill-color:#777!important}
@@ -858,8 +859,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
       <button type="button" class="ptab active" id="ptab-simple"  data-switch="simple" >📄 簡易版</button>
       <button type="button" class="ptab"        id="ptab-detail"  data-switch="detail" >📋 詳細版</button>
       <button type="button" class="ptab"        id="ptab-invoice" data-switch="invoice">🏢 事業所版</button>
-      <button type="button" id="pv-pdf"    data-action="savepdf">📥 PDF保存</button>
-      <button type="button" id="pv-print"  data-action="execprint">🖨️ 印刷</button>
+      <button type="button" id="pv-pdf"    data-action="savepdf">📥 PDF保存・印刷</button>
       <button type="button" id="pv-close"  data-action="close">✕ 閉じる</button>
     </div>
     <div id="pv-scroll">
@@ -1462,101 +1462,107 @@ function buildSheetHTML(mode){
       +'<div>'+toHtml+(toSub.length?'<div style="font-size:9px;color:#555;margin-top:3px">'+toSub.join('　')+'</div>':'')+'</div>'
       +'<div style="text-align:right;font-size:9px;color:#333;line-height:1.9">'+fromLines.join('<br>')+'</div></div>';
   }
-  /* ── 介護サービスコード表（請求書風のみ表示） ── */
+  /* ── 介護サービスコード表（事業所版のみ表示） ── */
   var svcCodeSec='';
   if(mode==='invoice'){
-    var svc2=document.getElementById('serviceType').value;
-    var lv2=parseInt(document.getElementById('careLevel').value);
-    var sr2=document.getElementById('shokaigo').value;
-    var baseCode=BASE_CODE[svc2]&&BASE_CODE[svc2][lv2]?BASE_CODE[svc2][lv2]:'—';
-    var svcLbl=SVCLABEL[svc2]||svc2;
-    var baseUnit=BASE[svc2]&&BASE[svc2][lv2]?BASE[svc2][lv2].toLocaleString('ja-JP'):'—';
-    var codeRows='';
-    var trStyle='border-bottom:1px solid #e5e5e5;';
-    var tdL='padding:5px 8px;font-size:9px;color:#333;';
-    var tdC='padding:5px 8px;font-size:9px;font-family:monospace;font-weight:700;color:#1a5fa8;text-align:center;';
-    var tdR='padding:5px 8px;font-size:9px;text-align:right;font-family:monospace;color:#444;';
-    /* 基本サービス費 */
-    codeRows+='<tr style="'+trStyle+'background:#f0f5ff">'
-      +'<td style="'+tdC+'">'+baseCode+'</td>'
-      +'<td style="'+tdL+'">定期巡回・随時対応型訪問介護看護費<br><span style="color:#666">'+svcLbl+'　要介護'+lv2+'</span></td>'
-      +'<td style="'+tdR+'">'+baseUnit+' 単位/月</td></tr>';
-    /* 初期加算（基本単位に含まれるためここに表示） */
-    var initCb=document.getElementById('c16');
-    if(initCb&&initCb.checked&&!initCb.disabled){
-      var initDaysVal=parseInt(document.getElementById('initDays').value)||30;
-      var initTotal=30*initDaysVal;
-      codeRows+='<tr style="'+trStyle+'background:#e8f0ff">'
-        +'<td style="'+tdC+'color:#1a5fa8;">764002</td>'
-        +'<td style="'+tdL+'">初期加算<br><span style="color:#666">利用開始後30日以内　'+initDaysVal+'日 × 30単位/日</span></td>'
-        +'<td style="'+tdR+'">＋'+initTotal.toLocaleString('ja-JP')+' 単位</td></tr>';
+    var svc2El=document.getElementById('serviceType');
+    var lv2El=document.getElementById('careLevel');
+    var sr2El=document.getElementById('shokaigo');
+    if(!svc2El||!lv2El||!sr2El){ svcCodeSec=''; }
+    else {
+      var svc2=svc2El.value;
+      var lv2=parseInt(lv2El.value);
+      var sr2=sr2El.value;
+      var baseCode=(typeof BASE_CODE!=='undefined'&&BASE_CODE[svc2]&&BASE_CODE[svc2][lv2])?BASE_CODE[svc2][lv2]:'—';
+      var svcLbl=(typeof SVCLABEL!=='undefined'&&SVCLABEL[svc2])?SVCLABEL[svc2]:svc2;
+      var baseUnit=(typeof BASE!=='undefined'&&BASE[svc2]&&BASE[svc2][lv2])?BASE[svc2][lv2].toLocaleString('ja-JP'):'—';
+      var codeRows='';
+      var trStyle='border-bottom:1px solid #e5e5e5;';
+      var tdL='padding:5px 8px;font-size:9px;color:#333;';
+      var tdC='padding:5px 8px;font-size:9px;font-family:monospace;font-weight:700;color:#1a5fa8;text-align:center;';
+      var tdR='padding:5px 8px;font-size:9px;text-align:right;font-family:monospace;color:#444;';
+      /* 基本サービス費 */
+      codeRows+='<tr style="'+trStyle+'background:#f0f5ff">'
+        +'<td style="'+tdC+'">'+baseCode+'</td>'
+        +'<td style="'+tdL+'">定期巡回・随時対応型訪問介護看護費<br><span style="color:#666">'+svcLbl+'　要介護'+lv2+'</span></td>'
+        +'<td style="'+tdR+'">'+baseUnit+' 単位/月</td></tr>';
+      /* 初期加算（基本単位に含まれるためここに表示） */
+      var initCb=document.getElementById('c16');
+      var initDaysEl=document.getElementById('initDays');
+      if(initCb&&initCb.checked&&!initCb.disabled){
+        var initDaysVal=parseInt(initDaysEl?initDaysEl.value:30)||30;
+        var initTotal=30*initDaysVal;
+        codeRows+='<tr style="'+trStyle+'background:#e8f0ff">'
+          +'<td style="'+tdC+'color:#1a5fa8;">764002</td>'
+          +'<td style="'+tdL+'">初期加算<br><span style="color:#666">利用開始後30日以内　'+initDaysVal+'日 × 30単位/日</span></td>'
+          +'<td style="'+tdR+'">＋'+initTotal.toLocaleString('ja-JP')+' 単位</td></tr>';
+      }
+      /* 加算（data-code 属性があるもの・初期加算c16は上で処理済みのため除外） */
+      var allCbsCode=document.querySelectorAll('.cb-input[data-code]:checked');
+      for(var ci=0;ci<allCbsCode.length;ci++){
+        var cbEl=allCbsCode[ci];
+        if(cbEl.disabled) continue;
+        if(cbEl.id==='c16') continue;
+        var cbCode=cbEl.getAttribute('data-code');
+        var cbLbl=cbEl.getAttribute('data-label')||'';
+        var cbVal=cbEl.getAttribute('data-value')||cbEl.getAttribute('data-per-day')||'—';
+        var cbPct=cbEl.getAttribute('data-pct')||cbEl.getAttribute('data-pct-deduct')||'';
+        var unitStr=cbVal!=='—'?(parseInt(cbVal).toLocaleString('ja-JP')+' 単位'):(cbPct?(Math.round(parseFloat(cbPct)*100)+'%'):'—');
+        var isDeduct=cbEl.getAttribute('data-deduct')||cbEl.getAttribute('data-pct-deduct');
+        var rowBg=isDeduct?'background:#fff5f5':'';
+        var codeColor=isDeduct?'color:#c0392b;':'color:#1a5fa8;';
+        codeRows+='<tr style="'+trStyle+rowBg+'">'
+          +'<td style="'+tdC+codeColor+'">'+cbCode+'</td>'
+          +'<td style="'+tdL+'">'+cbLbl+'</td>'
+          +'<td style="'+tdR+'">'+(isDeduct?'−':'')+unitStr+'</td></tr>';
+      }
+      /* 処遇改善加算 */
+      if(sr2&&sr2!=='0'&&typeof SHOKAI_CODE!=='undefined'&&SHOKAI_CODE[sr2]){
+        var shCode=SHOKAI_CODE[sr2];
+        var shLbl=(typeof SHOKAI_LABEL!=='undefined'&&SHOKAI_LABEL[sr2])?SHOKAI_LABEL[sr2]:'処遇改善加算';
+        var shPct=Math.round(parseFloat(sr2)*1000)/10;
+        codeRows+='<tr style="'+trStyle+'background:#f0fff4">'
+          +'<td style="'+tdC+'color:#1a7a3c;">'+shCode+'</td>'
+          +'<td style="'+tdL+'">'+shLbl+'</td>'
+          +'<td style="'+tdR+'">＋'+shPct+'%</td></tr>';
+      }
+      /* 通所利用減算 */
+      var dcDays2El=document.getElementById('daycareDays');
+      var dcRate2El=document.getElementById('daycareUnitRate');
+      var dcDays2=parseInt(dcDays2El?dcDays2El.value:0)||0;
+      var dcRate2=parseInt(dcRate2El?dcRate2El.value:0)||0;
+      if(dcDays2>0&&dcRate2>0){
+        var DAYCARE_CODE={
+          integrated_nursing:   {1:'764106',2:'764107',3:'764108',4:'764109',5:'764110'},
+          integrated_no_nursing:{1:'764101',2:'764102',3:'764103',4:'764104',5:'764105'},
+          cooperation:          {1:'764101',2:'764102',3:'764103',4:'764104',5:'764105'}
+        };
+        var DAYCARE_CODE_NAME={
+          integrated_nursing:   '通所利用減算（訪看あり）',
+          integrated_no_nursing:'通所利用減算（訪看なし）',
+          cooperation:          '通所利用減算（連携型）'
+        };
+        var dcCode=(DAYCARE_CODE[svc2]&&DAYCARE_CODE[svc2][lv2])?DAYCARE_CODE[svc2][lv2]:'—';
+        var dcName=DAYCARE_CODE_NAME[svc2]||'通所利用減算';
+        var dcTotal=dcRate2*dcDays2;
+        codeRows+='<tr style="'+trStyle+'background:#fff5f5">'
+          +'<td style="'+tdC+'color:#c0392b;">'+dcCode+'</td>'
+          +'<td style="'+tdL+'">'+dcName+'<br>'
+          +'<span style="color:#888">要介護'+lv2+'　'+dcDays2+'日 × '+dcRate2+'単位/日</span></td>'
+          +'<td style="'+tdR+'color:#c0392b;">−'+dcTotal.toLocaleString('ja-JP')+' 単位</td></tr>';
+      }
+      svcCodeSec='<div id="pv-code-sec" style="margin-bottom:11px">'
+        +'<div style="font-size:8px;font-weight:700;letter-spacing:.08em;color:#555;margin-bottom:5px;border-left:3px solid #1a5fa8;padding-left:6px">介護サービスコード一覧（令和6年度）</div>'
+        +'<table style="width:100%;border-collapse:collapse;border:1px solid #ccc;border-radius:5px;overflow:hidden">'
+        +'<thead><tr style="background:#1a5fa8;color:#fff">'
+        +'<th style="padding:5px 8px;font-size:8px;text-align:center;width:80px">サービスコード</th>'
+        +'<th style="padding:5px 8px;font-size:8px;text-align:left">サービス内容略称</th>'
+        +'<th style="padding:5px 8px;font-size:8px;text-align:right;width:100px">単位数等</th>'
+        +'</tr></thead>'
+        +'<tbody>'+codeRows+'</tbody></table>'
+        +'<div style="font-size:7px;color:#999;margin-top:4px">※コードは厚生労働省「介護給付費単位数等サービスコード表（令和6年度版）」に基づきます。請求前に必ず最新の告示をご確認ください。</div>'
+        +'</div>';
     }
-    /* 加算（data-code 属性があるもの・初期加算c16は上で処理済みのため除外） */
-    var allCbsCode=document.querySelectorAll('.cb-input[data-code]:checked');
-    for(var ci=0;ci<allCbsCode.length;ci++){
-      var cbEl=allCbsCode[ci];
-      if(cbEl.disabled) continue;
-      if(cbEl.id==='c16') continue; /* 初期加算は基本単位セクションで表示済み */
-      var cbCode=cbEl.getAttribute('data-code');
-      var cbLbl=cbEl.getAttribute('data-label')||'';
-      var cbVal=cbEl.getAttribute('data-value')||cbEl.getAttribute('data-per-day')||'—';
-      var cbPct=cbEl.getAttribute('data-pct')||cbEl.getAttribute('data-pct-deduct')||'';
-      var unitStr=cbVal!=='—'?(parseInt(cbVal).toLocaleString('ja-JP')+' 単位'):(cbPct?(Math.round(parseFloat(cbPct)*100)+'%'):'—');
-      var isDeduct=cbEl.getAttribute('data-deduct')||cbEl.getAttribute('data-pct-deduct');
-      var rowBg=isDeduct?'background:#fff5f5':'';
-      var codeColor=isDeduct?'color:#c0392b;':'color:#1a5fa8;';
-      codeRows+='<tr style="'+trStyle+rowBg+'">'
-        +'<td style="'+tdC+codeColor+'">'+cbCode+'</td>'
-        +'<td style="'+tdL+'">'+cbLbl+'</td>'
-        +'<td style="'+tdR+'">'+(isDeduct?'−':'')+unitStr+'</td></tr>';
-    }
-    /* 処遇改善加算 */
-    if(sr2&&sr2!=='0'&&SHOKAI_CODE[sr2]){
-      var shCode=SHOKAI_CODE[sr2];
-      var shLbl=SHOKAI_LABEL[sr2]||'処遇改善加算';
-      var shPct=Math.round(parseFloat(sr2)*1000)/10;
-      codeRows+='<tr style="'+trStyle+'background:#f0fff4">'
-        +'<td style="'+tdC+'color:#1a7a3c;">'+shCode+'</td>'
-        +'<td style="'+tdL+'">'+shLbl+'</td>'
-        +'<td style="'+tdR+'">＋'+shPct+'%</td></tr>';
-    }
-    /* 通所利用減算（動的計算分） */
-    var dcDays2=parseInt(document.getElementById('daycareDays').value)||0;
-    var dcRate2=parseInt(document.getElementById('daycareUnitRate').value)||0;
-    if(dcDays2>0&&dcRate2>0){
-      /* 種別と要介護度からコードを決定（厚生労働省告示コード表より） */
-      /* integrated_nursing=イ(2)訪看あり: 764106〜764110
-         integrated_no_nursing/cooperation=イ(1)訪看なし・ロ連携型: 764101〜764105 */
-      var DAYCARE_CODE={
-        integrated_nursing:   {1:'764106',2:'764107',3:'764108',4:'764109',5:'764110'},
-        integrated_no_nursing:{1:'764101',2:'764102',3:'764103',4:'764104',5:'764105'},
-        cooperation:          {1:'764101',2:'764102',3:'764103',4:'764104',5:'764105'}
-      };
-      var DAYCARE_CODE_NAME={
-        integrated_nursing:   '通所利用減算（訪看あり）',
-        integrated_no_nursing:'通所利用減算（訪看なし）',
-        cooperation:          '通所利用減算（連携型）'
-      };
-      var dcCode=(DAYCARE_CODE[svc2]&&DAYCARE_CODE[svc2][lv2])?DAYCARE_CODE[svc2][lv2]:'—';
-      var dcName=(DAYCARE_CODE_NAME[svc2]||'通所利用減算');
-      var dcTotal=dcRate2*dcDays2;
-      codeRows+='<tr style="'+trStyle+'background:#fff5f5">'
-        +'<td style="'+tdC+'color:#c0392b;">'+dcCode+'</td>'
-        +'<td style="'+tdL+'">'+dcName+'<br>'
-        +'<span style="color:#888">要介護'+lv2+'　'+dcDays2+'日 × '+dcRate2+'単位/日</span></td>'
-        +'<td style="'+tdR+'color:#c0392b;">−'+dcTotal.toLocaleString('ja-JP')+' 単位</td></tr>';
-    }
-    svcCodeSec='<div id="pv-code-sec" style="margin-bottom:11px">'
-      +'<div style="font-size:8px;font-weight:700;letter-spacing:.08em;color:#555;margin-bottom:5px;border-left:3px solid #1a5fa8;padding-left:6px">介護サービスコード一覧（令和6年度）</div>'
-      +'<table style="width:100%;border-collapse:collapse;border:1px solid #ccc;border-radius:5px;overflow:hidden">'
-      +'<thead><tr style="background:#1a5fa8;color:#fff">'
-      +'<th style="padding:5px 8px;font-size:8px;text-align:center;width:80px">サービスコード</th>'
-      +'<th style="padding:5px 8px;font-size:8px;text-align:left">サービス内容略称</th>'
-      +'<th style="padding:5px 8px;font-size:8px;text-align:right;width:100px">単位数等</th>'
-      +'</tr></thead>'
-      +'<tbody>'+codeRows+'</tbody></table>'
-      +'<div style="font-size:7px;color:#999;margin-top:4px">※コードは厚生労働省「介護給付費単位数等サービスコード表（令和6年度版）」に基づきます。請求前に必ず最新の告示をご確認ください。</div>'
-      +'</div>';
   }
 
   var amtSize=mode==='simple'?'38px':'28px';
@@ -1617,25 +1623,68 @@ function closePreview(){
 }
 
 function execPrint(){
-  var titles={
-    simple:'定期巡回・随時対応型訪問介護看護　月額自己負担額（概算）',
-    detail:'定期巡回・随時対応型訪問介護看護　利用料計算結果（概算）',
-    invoice:'定期巡回・随時対応型訪問介護看護　事業所版 利用料のご案内'
-  };
-  var svcEl=document.getElementById('serviceType');
-  var lvEl=document.getElementById('careLevel');
-  var tMonth=(document.getElementById('targetMonth').value||'').trim();
-  var sub=svcEl.options[svcEl.selectedIndex].text+'　'+lvEl.options[lvEl.selectedIndex].text;
-  if(tMonth) sub+='　対象月：'+tMonth;
-  document.getElementById('pt-title').textContent=titles[_pvMode];
-  document.getElementById('pt-sub').textContent=sub;
-  closePreview();
-  /* モーダルを閉じた後、結果を表示状態にしてからスクロールを一番上に戻して印刷 */
-  setTimeout(function(){
-    document.getElementById('result').style.display='block';
-    window.scrollTo(0,0);
-    window.print();
-  },300);
+  /* pv-sheetの中身を取得 */
+  var sheet=document.getElementById('pv-sheet');
+  if(!sheet||!sheet.innerHTML||sheet.innerHTML.trim()===''){
+    document.getElementById('pv-sheet').innerHTML=buildSheetHTML(_pvMode);
+  }
+  var sheetHTML=document.getElementById('pv-sheet').innerHTML;
+  if(!sheetHTML||sheetHTML.trim()===''){
+    alert('先に計算を実行してからプレビューを開いて印刷してください。');
+    return;
+  }
+
+  /* 印刷用HTMLを文字列で組み立てる */
+  var html=[
+    '<!DOCTYPE html>',
+    '<html lang="ja">',
+    '<head>',
+    '<meta charset="UTF-8">',
+    '<meta name="viewport" content="width=device-width,initial-scale=1">',
+    '<title>定期巡回 利用料計算</title>',
+    '<style>',
+    '*{box-sizing:border-box;margin:0;padding:0}',
+    'body{font-family:-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;background:#fff;color:#000;padding:14px;font-size:10px}',
+    'table{border-collapse:collapse;width:100%}',
+    'th,td{word-break:break-word}',
+    '@media print{',
+    '  body{padding:0}',
+    '  @page{size:A4 portrait;margin:12mm 10mm}',
+    '}',
+    '</style>',
+    '</head>',
+    '<body>',
+    sheetHTML,
+    '<script>',
+    'window.addEventListener("load",function(){',
+    '  setTimeout(function(){window.print();},500);',
+    '});',
+    '<\/script>',
+    '</body>',
+    '</html>'
+  ].join('\n');
+
+  /* BlobURL方式で新しいウィンドウを開く（document.writeより安定） */
+  try{
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var win=window.open(url,'_blank');
+    if(!win){
+      URL.revokeObjectURL(url);
+      alert('ポップアップがブロックされています。\nブラウザの設定でポップアップを許可してください。');
+      return;
+    }
+    /* 5秒後にBlobURLを解放 */
+    setTimeout(function(){ URL.revokeObjectURL(url); },5000);
+  }catch(e){
+    /* Blob非対応ブラウザのフォールバック */
+    var win2=window.open('','_blank');
+    if(win2){
+      win2.document.open();
+      win2.document.write(html);
+      win2.document.close();
+    }
+  }
 }
 
 function savePDF(){
@@ -1744,6 +1793,13 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
         if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
         try{ doc.save(fname); }
         catch(e){ window.open(doc.output('datauristring'),'_blank'); }
+        /* PDF保存後に印刷ダイアログを開く */
+        setTimeout(function(){
+          var blob=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
+          var url=URL.createObjectURL(blob);
+          var pwin=window.open(url,'_blank');
+          if(pwin){ setTimeout(function(){ pwin.print(); URL.revokeObjectURL(url); },800); }
+        },600);
       }).catch(function(err){
         document.body.removeChild(p2div);
         if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
@@ -1794,6 +1850,13 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
     if(pvBtn){ pvBtn.textContent = origText; pvBtn.disabled = false; }
     try{ doc.save(fname); }
     catch(e){ var dataUri = doc.output('datauristring'); window.open(dataUri, '_blank'); }
+    /* PDF保存後に印刷ダイアログを開く */
+    setTimeout(function(){
+      var blob2=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
+      var url2=URL.createObjectURL(blob2);
+      var pwin2=window.open(url2,'_blank');
+      if(pwin2){ setTimeout(function(){ pwin2.print(); URL.revokeObjectURL(url2); },800); }
+    },600);
   }).catch(function(err){
     if(pvBtn){ pvBtn.textContent = origText; pvBtn.disabled = false; }
     alert('PDF生成に失敗しました。\n' + err.message);
