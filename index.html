@@ -1722,51 +1722,57 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
   var contentW = pageW - margin * 2;
   var pageContentH = pageH - margin * 2;
 
-  /* ── 事業所版：2ページ構成（1p=利用料、2p=コード表） ── */
+  /* ── 事業所版：2ページ構成（1p=利用料一覧、2p=コード表） ── */
   if(_pvMode === 'invoice'){
+
+    /* ページ1用：sheetをクローンしてコード表・注意書きを完全除去 */
+    var p1div = document.createElement('div');
+    p1div.style.cssText='position:fixed;left:-9999px;top:0;width:'+sheetW+'px;background:#fff;';
+    p1div.innerHTML = sheet.innerHTML;
+    var rmCode = p1div.querySelector('#pv-code-sec');
+    var rmNote = p1div.querySelector('[style*="fffbe6"]');
+    if(rmCode) rmCode.parentNode.removeChild(rmCode);
+    if(rmNote) rmNote.parentNode.removeChild(rmNote);
+    document.body.appendChild(p1div);
+
+    /* ページ2用：コード表＋注意書きのみ */
     var codeSec = document.getElementById('pv-code-sec');
-    var noteBox = sheet.querySelector('[style*="fffbe6"]'); /* 注意書きdiv */
+    var svcEl2  = document.getElementById('serviceType');
+    var lvEl2   = document.getElementById('careLevel');
+    var uName2  = (document.getElementById('userName').value||'').trim();
+    var tMonth2 = (document.getElementById('targetMonth').value||'').trim();
+    var hdr2 = '<div style="font-size:11px;font-weight:700;color:#1a5fa8;border-bottom:2px solid #1a5fa8;padding-bottom:5px;margin-bottom:10px">'
+      +'定期巡回・随時対応型訪問介護看護　介護サービスコード一覧'
+      +(uName2?'<span style="font-size:9px;font-weight:400;color:#555;margin-left:10px">'+uName2+'様</span>':'')
+      +(tMonth2?'<span style="font-size:9px;font-weight:400;color:#555;margin-left:8px">対象月：'+tMonth2+'</span>':'')
+      +'<br><span style="font-size:8px;font-weight:400;color:#555;">'
+      +svcEl2.options[svcEl2.selectedIndex].text+'　'
+      +lvEl2.options[lvEl2.selectedIndex].text+'</span></div>';
+    var p2div = document.createElement('div');
+    p2div.style.cssText='position:fixed;left:-9999px;top:0;width:'+sheetW+'px;background:#fff;padding:10px;font-family:sans-serif;';
+    p2div.innerHTML = hdr2
+      + (codeSec ? codeSec.outerHTML : '<p style="color:#999;font-size:9px">コード表データがありません</p>')
+      + '<div style="background:#fffbe6;border:1px solid #e0c040;border-radius:5px;padding:7px 10px;font-size:8px;color:#665500;margin-top:8px"><strong>⚠ ご注意</strong>　概算計算です。</div>';
+    document.body.appendChild(p2div);
 
-    /* --- ページ1：コード表・注意書きを非表示にしてキャプチャ --- */
-    if(codeSec) codeSec.style.display='none';
-    if(noteBox) noteBox.style.display='none';
     var opt1={scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,
-              windowWidth:sheetW,windowHeight:sheet.scrollHeight};
-    html2canvas(sheet, opt1).then(function(canvas1){
-      /* コード表・注意書きを再表示 */
-      if(codeSec) codeSec.style.display='';
-      if(noteBox) noteBox.style.display='';
+              windowWidth:sheetW,windowHeight:p1div.scrollHeight};
+    var opt2={scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,
+              windowWidth:sheetW,windowHeight:p2div.scrollHeight};
 
-      /* --- ページ2：コード表と注意書きだけのミニシートを作成してキャプチャ --- */
-      var p2div = document.createElement('div');
-      p2div.style.cssText='position:fixed;left:-9999px;top:0;width:'+sheetW+'px;background:#fff;padding:10px;font-family:sans-serif;';
-      /* ページ2ヘッダー */
-      var svcEl2=document.getElementById('serviceType');
-      var lvEl2=document.getElementById('careLevel');
-      var hdr2='<div style="font-size:11px;font-weight:700;color:#1a5fa8;border-bottom:2px solid #1a5fa8;padding-bottom:5px;margin-bottom:10px">'
-        +'定期巡回・随時対応型訪問介護看護　事業所版 介護サービスコード表'
-        +'<span style="font-size:8px;font-weight:400;color:#555;margin-left:10px">'
-        +svcEl2.options[svcEl2.selectedIndex].text+'　'
-        +lvEl2.options[lvEl2.selectedIndex].text+'</span></div>';
-      p2div.innerHTML = hdr2 + (codeSec ? codeSec.outerHTML : '') +
-        '<div style="background:#fffbe6;border:1px solid #e0c040;border-radius:5px;padding:7px 10px;font-size:8px;color:#665500;margin-top:8px"><strong>⚠ ご注意</strong>　概算計算です。</div>';
-      document.body.appendChild(p2div);
-
-      var opt2={scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,
-                windowWidth:sheetW,windowHeight:p2div.scrollHeight};
+    html2canvas(p1div, opt1).then(function(canvas1){
+      document.body.removeChild(p1div);
       html2canvas(p2div, opt2).then(function(canvas2){
         document.body.removeChild(p2div);
 
-        /* --- jsPDF に2ページ追加 --- */
         var doc = new jsPDFLib({orientation:'portrait',unit:'mm',format:'a4'});
-
         function addCanvasToDoc(cv, isFirst){
           var iW=cv.width, iH=cv.height;
           var ratio=contentW/(iW/CANVAS_SCALE);
           var scaledH=(iH/CANVAS_SCALE)*ratio;
           if(!isFirst) doc.addPage();
           if(scaledH<=pageContentH){
-            doc.addImage(cv.toDataURL('image/jpeg',0.92),'JPEG',margin,margin,contentW,scaledH);
+            doc.addImage(cv.toDataURL('image/jpeg',0.93),'JPEG',margin,margin,contentW,scaledH);
           } else {
             var pageImgH=Math.floor(pageContentH/ratio*CANVAS_SCALE);
             var oy=0;
@@ -1776,13 +1782,13 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
               sc.width=iW; sc.height=sh;
               sc.getContext('2d').drawImage(cv,0,oy,iW,sh,0,0,iW,sh);
               if(oy>0) doc.addPage();
-              doc.addImage(sc.toDataURL('image/jpeg',0.92),'JPEG',margin,margin,contentW,(sh/CANVAS_SCALE)*ratio);
+              doc.addImage(sc.toDataURL('image/jpeg',0.93),'JPEG',margin,margin,contentW,(sh/CANVAS_SCALE)*ratio);
               oy+=sh;
             }
           }
         }
-        addCanvasToDoc(canvas1, true);
-        addCanvasToDoc(canvas2, false);
+        addCanvasToDoc(canvas1, true);  /* 1ページ目：利用料一覧 */
+        addCanvasToDoc(canvas2, false); /* 2ページ目：コード表 */
 
         var uName=(document.getElementById('userName').value||'').trim();
         var tMonth=(document.getElementById('targetMonth').value||'').trim();
@@ -1793,21 +1799,22 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
         if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
         try{ doc.save(fname); }
         catch(e){ window.open(doc.output('datauristring'),'_blank'); }
-        /* PDF保存後に印刷ダイアログを開く */
         setTimeout(function(){
-          var blob=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
-          var url=URL.createObjectURL(blob);
-          var pwin=window.open(url,'_blank');
-          if(pwin){ setTimeout(function(){ pwin.print(); URL.revokeObjectURL(url); },800); }
+          try{
+            var blob=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
+            var url=URL.createObjectURL(blob);
+            var pwin=window.open(url,'_blank');
+            if(pwin){ setTimeout(function(){ pwin.print(); URL.revokeObjectURL(url); },800); }
+          }catch(e){}
         },600);
       }).catch(function(err){
-        document.body.removeChild(p2div);
+        if(document.body.contains(p2div)) document.body.removeChild(p2div);
         if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
         alert('PDF生成に失敗しました（P2）。\n'+err.message);
       });
     }).catch(function(err){
-      if(codeSec) codeSec.style.display='';
-      if(noteBox) noteBox.style.display='';
+      if(document.body.contains(p1div)) document.body.removeChild(p1div);
+      if(document.body.contains(p2div)) document.body.removeChild(p2div);
       if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
       alert('PDF生成に失敗しました（P1）。\n'+err.message);
     });
