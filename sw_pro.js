@@ -2,10 +2,13 @@
    Service Worker — 定期巡回計算ツール PRO版
    sw_pro.js
    ===================================================== */
-var CACHE_NAME = 'teiki-pro-v1';
+var CACHE_NAME = 'teiki-pro-v3';
 var ASSETS = [
   '/pro.vol.3/index_pro.html',
-  '/pro.vol.3/manifest_pro.json'
+  '/pro.vol.3/manifest_pro.json',
+  '/pro.vol.3/icon-180.png',
+  '/pro.vol.3/icon-192.png',
+  '/pro.vol.3/icon-512.png'
 ];
 
 /* インストール：キャッシュに登録 */
