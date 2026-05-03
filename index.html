@@ -330,12 +330,6 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
   -webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer;
   white-space:nowrap;-webkit-flex-shrink:0;flex-shrink:0;
 }
-#pv-print{
-  padding:9px 12px;background:var(--green);border:none;border-radius:8px;
-  color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;
-  -webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer;
-  white-space:nowrap;-webkit-flex-shrink:0;flex-shrink:0;
-}
 #pv-close{
   padding:9px 12px;background:var(--red);border:none;border-radius:8px;
   color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;
@@ -842,7 +836,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
     <div class="print-area">
       <div class="print-label">🖨️ 帳票プレビュー / 印刷</div>
       <div class="print-btns">
-        <button type="button" class="prev-btn" data-preview="simple">📄 簡易版<span>自己負担額のみ</span></button>
+        <button type="button" class="prev-btn" data-preview="simple">📊 詳細コード<span>コード一覧</span></button>
         <button type="button" class="prev-btn" data-preview="detail">📋 詳細版<span>計算内訳つき</span></button>
         <button type="button" class="prev-btn" data-preview="invoice">🏢 事業所版<span>利用者・事業所情報つき</span></button>
       </div>
@@ -856,7 +850,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
 <div id="pv-modal">
   <div id="pv-inner">
     <div id="pv-toolbar">
-      <button type="button" class="ptab active" id="ptab-simple"  data-switch="simple" >📄 簡易版</button>
+      <button type="button" class="ptab active" id="ptab-simple"  data-switch="simple" >📊 詳細コード</button>
       <button type="button" class="ptab"        id="ptab-detail"  data-switch="detail" >📋 詳細版</button>
       <button type="button" class="ptab"        id="ptab-invoice" data-switch="invoice">🏢 事業所版</button>
       <button type="button" id="pv-pdf"    data-action="savepdf">📥 PDF保存・印刷</button>
@@ -1413,7 +1407,7 @@ function buildSheetHTML(mode){
   var copayNote=document.getElementById('copay-note').textContent;
 
   var titles={
-    simple:'定期巡回・随時対応型訪問介護看護　月額自己負担額（概算）',
+    simple:'定期巡回・随時対応型訪問介護看護　介護サービスコード一覧（概算）',
     detail:'定期巡回・随時対応型訪問介護看護　利用料計算結果（概算）',
     invoice:'定期巡回・随時対応型訪問介護看護　事業所版 利用料のご案内'
   };
@@ -1569,6 +1563,99 @@ function buildSheetHTML(mode){
   var bkSec=mode==='simple'?'':'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:11px">'+bkHtml+'</div>';
   var stSec=mode==='simple'?'':'<table style="width:100%;border-collapse:collapse;margin-bottom:10px">'+stepsHtml+'</table>';
 
+  /* ── 簡易版：氏名＋サービスコード表のみ ── */
+  if(mode==='simple'){
+    /* サービスコード表を生成（invoice共通ロジック） */
+    var svc2El2=document.getElementById('serviceType');
+    var lv2El2=document.getElementById('careLevel');
+    var sr2El2=document.getElementById('shokaigo');
+    var simpleCodeRows='';
+    if(svc2El2&&lv2El2&&sr2El2){
+      var sv2=svc2El2.value; var lv22=parseInt(lv2El2.value); var sr22=sr2El2.value;
+      var bc2=(typeof BASE_CODE!=='undefined'&&BASE_CODE[sv2]&&BASE_CODE[sv2][lv22])?BASE_CODE[sv2][lv22]:'—';
+      var sl2=(typeof SVCLABEL!=='undefined'&&SVCLABEL[sv2])?SVCLABEL[sv2]:sv2;
+      var bu2=(typeof BASE!=='undefined'&&BASE[sv2]&&BASE[sv2][lv22])?BASE[sv2][lv22].toLocaleString('ja-JP'):'—';
+      var tr2='border-bottom:1px solid #e5e5e5;';
+      var tL2='padding:5px 8px;font-size:9px;color:#333;';
+      var tC2='padding:5px 8px;font-size:9px;font-family:monospace;font-weight:700;color:#1a5fa8;text-align:center;';
+      var tR2='padding:5px 8px;font-size:9px;text-align:right;font-family:monospace;color:#444;';
+      /* 基本サービス費 */
+      simpleCodeRows+='<tr style="'+tr2+'background:#f0f5ff">'
+        +'<td style="'+tC2+'">'+bc2+'</td>'
+        +'<td style="'+tL2+'">定期巡回・随時対応型訪問介護看護費<br><span style="color:#666">'+sl2+'　要介護'+lv22+'</span></td>'
+        +'<td style="'+tR2+'">'+bu2+' 単位/月</td></tr>';
+      /* 初期加算 */
+      var initCb2=document.getElementById('c16');
+      if(initCb2&&initCb2.checked&&!initCb2.disabled){
+        var initDEL=parseInt((document.getElementById('initDays')||{value:30}).value)||30;
+        simpleCodeRows+='<tr style="'+tr2+'background:#e8f0ff">'
+          +'<td style="'+tC2+'">764002</td>'
+          +'<td style="'+tL2+'">初期加算（'+initDEL+'日 × 30単位）</td>'
+          +'<td style="'+tR2+'">＋'+(30*initDEL).toLocaleString('ja-JP')+' 単位</td></tr>';
+      }
+      /* 加算・減算 */
+      var cbs2=document.querySelectorAll('.cb-input[data-code]:checked');
+      for(var ci2=0;ci2<cbs2.length;ci2++){
+        var cb2=cbs2[ci2]; if(cb2.disabled||cb2.id==='c16') continue;
+        var code2=cb2.getAttribute('data-code');
+        var lbl2=cb2.getAttribute('data-label')||'';
+        var val2=cb2.getAttribute('data-value')||cb2.getAttribute('data-per-day')||'—';
+        var pct2=cb2.getAttribute('data-pct')||cb2.getAttribute('data-pct-deduct')||'';
+        var ustr2=val2!=='—'?(parseInt(val2).toLocaleString('ja-JP')+' 単位'):(pct2?(Math.round(parseFloat(pct2)*100)+'%'):'—');
+        var isDed2=cb2.getAttribute('data-deduct')||cb2.getAttribute('data-pct-deduct');
+        simpleCodeRows+='<tr style="'+tr2+(isDed2?'background:#fff5f5':'')+'">'
+          +'<td style="'+tC2+(isDed2?'color:#c0392b;':'')+'">'+code2+'</td>'
+          +'<td style="'+tL2+'">'+lbl2+'</td>'
+          +'<td style="'+tR2+'">'+(isDed2?'−':'')+ustr2+'</td></tr>';
+      }
+      /* 処遇改善加算 */
+      if(sr22&&sr22!=='0'&&typeof SHOKAI_CODE!=='undefined'&&SHOKAI_CODE[sr22]){
+        var shC2=SHOKAI_CODE[sr22];
+        var shL2=(typeof SHOKAI_LABEL!=='undefined'&&SHOKAI_LABEL[sr22])?SHOKAI_LABEL[sr22]:'処遇改善加算';
+        var shP2=Math.round(parseFloat(sr22)*1000)/10;
+        simpleCodeRows+='<tr style="'+tr2+'background:#f0fff4">'
+          +'<td style="'+tC2+'color:#1a7a3c;">'+shC2+'</td>'
+          +'<td style="'+tL2+'">'+shL2+'</td>'
+          +'<td style="'+tR2+'">＋'+shP2+'%</td></tr>';
+      }
+    }
+
+    var simpleNameBlock=(uName||stName
+      ?'<div style="margin-bottom:12px;padding:10px 14px;background:#f0f5ff;border-left:4px solid #1a5fa8;border-radius:0 6px 6px 0">'
+        +(uName
+          ?'<div style="margin-bottom:6px">'
+            +'<span style="font-size:8px;color:#555;display:block;margin-bottom:2px">利用者</span>'
+            +'<span style="font-size:18px;font-weight:700;color:#000">'+uName+'</span>'
+            +'<span style="font-size:13px;color:#333;margin-left:6px">様</span>'
+            +(tMonth?'<span style="font-size:8px;color:#666;margin-left:14px">対象月：'+tMonth+'</span>':'')
+            +'</div>'
+          :'')
+        +(stName
+          ?'<div>'
+            +'<span style="font-size:8px;color:#555;display:block;margin-bottom:2px">担当者</span>'
+            +'<span style="font-size:14px;font-weight:700;color:#333">'+stName+'</span>'
+            +'</div>'
+          :'')
+        +'</div>'
+      : (tMonth?'<div style="margin-bottom:10px;font-size:9px;color:#555">対象月：'+tMonth+'</div>':''));
+
+    return '<div style="font-family:sans-serif;font-size:10px;color:#000">'
+      +'<h2 style="font-size:12px;font-weight:700;border-bottom:2px solid #1a5fa8;padding-bottom:6px;margin-bottom:10px;color:#000">'
+      +'定期巡回・随時対応型訪問介護看護　介護サービスコード一覧（概算）</h2>'
+      +'<p style="font-size:8px;color:#555;margin-bottom:10px">'+subtitle+'</p>'
+      +simpleNameBlock
+      +'<table style="width:100%;border-collapse:collapse;border:1px solid #ccc;border-radius:5px;overflow:hidden;margin-bottom:10px">'
+      +'<thead><tr style="background:#1a5fa8;color:#fff">'
+      +'<th style="padding:5px 8px;font-size:8px;text-align:center;width:80px">サービスコード</th>'
+      +'<th style="padding:5px 8px;font-size:8px;text-align:left">サービス内容</th>'
+      +'<th style="padding:5px 8px;font-size:8px;text-align:right;width:100px">単位数等</th>'
+      +'</tr></thead>'
+      +'<tbody>'+simpleCodeRows+'</tbody></table>'
+      +'<div style="background:#fffbe6;border:1px solid #e0c040;border-radius:5px;padding:7px 10px;font-size:8px;color:#665500">'
+      +'<strong>⚠ ご注意</strong>　概算計算です。</div>'
+      +'</div>';
+  }
+
   return '<div style="font-family:sans-serif;font-size:10px;color:#000">'
     +'<h2 style="font-size:13px;font-weight:700;border-bottom:2px solid #1a5fa8;padding-bottom:7px;margin-bottom:3px;color:#000">'+titles[mode]+'</h2>'
     +'<p style="font-size:8px;color:#555;margin-bottom:12px">'+subtitle+'</p>'
@@ -1622,71 +1709,6 @@ function closePreview(){
   window.scrollTo(0,_scrollY);
 }
 
-function execPrint(){
-  /* pv-sheetの中身を取得 */
-  var sheet=document.getElementById('pv-sheet');
-  if(!sheet||!sheet.innerHTML||sheet.innerHTML.trim()===''){
-    document.getElementById('pv-sheet').innerHTML=buildSheetHTML(_pvMode);
-  }
-  var sheetHTML=document.getElementById('pv-sheet').innerHTML;
-  if(!sheetHTML||sheetHTML.trim()===''){
-    alert('先に計算を実行してからプレビューを開いて印刷してください。');
-    return;
-  }
-
-  /* 印刷用HTMLを文字列で組み立てる */
-  var html=[
-    '<!DOCTYPE html>',
-    '<html lang="ja">',
-    '<head>',
-    '<meta charset="UTF-8">',
-    '<meta name="viewport" content="width=device-width,initial-scale=1">',
-    '<title>定期巡回 利用料計算</title>',
-    '<style>',
-    '*{box-sizing:border-box;margin:0;padding:0}',
-    'body{font-family:-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;background:#fff;color:#000;padding:14px;font-size:10px}',
-    'table{border-collapse:collapse;width:100%}',
-    'th,td{word-break:break-word}',
-    '@media print{',
-    '  body{padding:0}',
-    '  @page{size:A4 portrait;margin:12mm 10mm}',
-    '}',
-    '</style>',
-    '</head>',
-    '<body>',
-    sheetHTML,
-    '<script>',
-    'window.addEventListener("load",function(){',
-    '  setTimeout(function(){window.print();},500);',
-    '});',
-    '<\/script>',
-    '</body>',
-    '</html>'
-  ].join('\n');
-
-  /* BlobURL方式で新しいウィンドウを開く（document.writeより安定） */
-  try{
-    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
-    var url=URL.createObjectURL(blob);
-    var win=window.open(url,'_blank');
-    if(!win){
-      URL.revokeObjectURL(url);
-      alert('ポップアップがブロックされています。\nブラウザの設定でポップアップを許可してください。');
-      return;
-    }
-    /* 5秒後にBlobURLを解放 */
-    setTimeout(function(){ URL.revokeObjectURL(url); },5000);
-  }catch(e){
-    /* Blob非対応ブラウザのフォールバック */
-    var win2=window.open('','_blank');
-    if(win2){
-      win2.document.open();
-      win2.document.write(html);
-      win2.document.close();
-    }
-  }
-}
-
 function savePDF(){
   var pvBtn = document.getElementById('pv-pdf');
   var origText = pvBtn ? pvBtn.textContent : '';
@@ -1722,103 +1744,132 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
   var contentW = pageW - margin * 2;
   var pageContentH = pageH - margin * 2;
 
-  /* ── 事業所版：2ページ構成（1p=利用料一覧、2p=コード表） ── */
+  /* ── 事業所版（invoice）：全内容（利用者情報＋計算内訳＋コード表）PDF ── */
   if(_pvMode === 'invoice'){
-
-    /* ページ1用：sheetをクローンしてコード表・注意書きを完全除去 */
-    var p1div = document.createElement('div');
-    p1div.style.cssText='position:fixed;left:-9999px;top:0;width:'+sheetW+'px;background:#fff;';
-    p1div.innerHTML = sheet.innerHTML;
-    var rmCode = p1div.querySelector('#pv-code-sec');
-    var rmNote = p1div.querySelector('[style*="fffbe6"]');
-    if(rmCode) rmCode.parentNode.removeChild(rmCode);
-    if(rmNote) rmNote.parentNode.removeChild(rmNote);
-    document.body.appendChild(p1div);
-
-    /* ページ2用：コード表＋注意書きのみ */
-    var codeSec = document.getElementById('pv-code-sec');
-    var svcEl2  = document.getElementById('serviceType');
-    var lvEl2   = document.getElementById('careLevel');
-    var uName2  = (document.getElementById('userName').value||'').trim();
-    var tMonth2 = (document.getElementById('targetMonth').value||'').trim();
-    var hdr2 = '<div style="font-size:11px;font-weight:700;color:#1a5fa8;border-bottom:2px solid #1a5fa8;padding-bottom:5px;margin-bottom:10px">'
-      +'定期巡回・随時対応型訪問介護看護　介護サービスコード一覧'
-      +(uName2?'<span style="font-size:9px;font-weight:400;color:#555;margin-left:10px">'+uName2+'様</span>':'')
-      +(tMonth2?'<span style="font-size:9px;font-weight:400;color:#555;margin-left:8px">対象月：'+tMonth2+'</span>':'')
-      +'<br><span style="font-size:8px;font-weight:400;color:#555;">'
-      +svcEl2.options[svcEl2.selectedIndex].text+'　'
-      +lvEl2.options[lvEl2.selectedIndex].text+'</span></div>';
-    var p2div = document.createElement('div');
-    p2div.style.cssText='position:fixed;left:-9999px;top:0;width:'+sheetW+'px;background:#fff;padding:10px;font-family:sans-serif;';
-    p2div.innerHTML = hdr2
-      + (codeSec ? codeSec.outerHTML : '<p style="color:#999;font-size:9px">コード表データがありません</p>')
-      + '<div style="background:#fffbe6;border:1px solid #e0c040;border-radius:5px;padding:7px 10px;font-size:8px;color:#665500;margin-top:8px"><strong>⚠ ご注意</strong>　概算計算です。</div>';
-    document.body.appendChild(p2div);
-
-    var opt1={scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,
-              windowWidth:sheetW,windowHeight:p1div.scrollHeight};
-    var opt2={scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,
-              windowWidth:sheetW,windowHeight:p2div.scrollHeight};
-
-    html2canvas(p1div, opt1).then(function(canvas1){
-      document.body.removeChild(p1div);
-      html2canvas(p2div, opt2).then(function(canvas2){
-        document.body.removeChild(p2div);
-
-        var doc = new jsPDFLib({orientation:'portrait',unit:'mm',format:'a4'});
-        function addCanvasToDoc(cv, isFirst){
-          var iW=cv.width, iH=cv.height;
-          var ratio=contentW/(iW/CANVAS_SCALE);
-          var scaledH=(iH/CANVAS_SCALE)*ratio;
-          if(!isFirst) doc.addPage();
-          if(scaledH<=pageContentH){
-            doc.addImage(cv.toDataURL('image/jpeg',0.93),'JPEG',margin,margin,contentW,scaledH);
-          } else {
-            var pageImgH=Math.floor(pageContentH/ratio*CANVAS_SCALE);
-            var oy=0;
-            while(oy<iH){
-              var sh=Math.min(pageImgH,iH-oy);
-              var sc=document.createElement('canvas');
-              sc.width=iW; sc.height=sh;
-              sc.getContext('2d').drawImage(cv,0,oy,iW,sh,0,0,iW,sh);
-              if(oy>0) doc.addPage();
-              doc.addImage(sc.toDataURL('image/jpeg',0.93),'JPEG',margin,margin,contentW,(sh/CANVAS_SCALE)*ratio);
-              oy+=sh;
-            }
-          }
+    var uNameI=(document.getElementById('userName').value||'').trim();
+    var tMonthI=(document.getElementById('targetMonth').value||'').trim();
+    var iDiv=document.createElement('div');
+    iDiv.style.cssText='position:fixed;left:-9999px;top:0;width:'+sheetW+'px;background:#fff;';
+    iDiv.innerHTML=sheet.innerHTML;
+    document.body.appendChild(iDiv);
+    var optI={scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,
+              windowWidth:sheetW,windowHeight:iDiv.scrollHeight};
+    html2canvas(iDiv,optI).then(function(canvas){
+      document.body.removeChild(iDiv);
+      var iW=canvas.width,iH=canvas.height;
+      var ratio=contentW/(iW/CANVAS_SCALE);
+      var scaledH=(iH/CANVAS_SCALE)*ratio;
+      var doc=new jsPDFLib({orientation:'portrait',unit:'mm',format:'a4'});
+      if(scaledH<=pageContentH){
+        doc.addImage(canvas.toDataURL('image/jpeg',0.93),'JPEG',margin,margin,contentW,scaledH);
+      } else {
+        var pageImgH=Math.floor(pageContentH/ratio*CANVAS_SCALE);
+        var oy=0;
+        while(oy<iH){
+          var sh=Math.min(pageImgH,iH-oy);
+          var sc=document.createElement('canvas');
+          sc.width=iW; sc.height=sh;
+          sc.getContext('2d').drawImage(canvas,0,oy,iW,sh,0,0,iW,sh);
+          if(oy>0) doc.addPage();
+          doc.addImage(sc.toDataURL('image/jpeg',0.93),'JPEG',margin,margin,contentW,(sh/CANVAS_SCALE)*ratio);
+          oy+=sh;
         }
-        addCanvasToDoc(canvas1, true);  /* 1ページ目：利用料一覧 */
-        addCanvasToDoc(canvas2, false); /* 2ページ目：コード表 */
-
-        var uName=(document.getElementById('userName').value||'').trim();
-        var tMonth=(document.getElementById('targetMonth').value||'').trim();
-        var now=new Date();
-        var dateStr=now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0');
-        var fname='teikiJunkai_jigyo'+(uName?'_'+uName:'')+'_'+(tMonth||dateStr)+'.pdf';
-        fname=fname.replace(/[\s　]/g,'_');
-        if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
-        try{ doc.save(fname); }
-        catch(e){ window.open(doc.output('datauristring'),'_blank'); }
-        setTimeout(function(){
-          try{
-            var blob=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
-            var url=URL.createObjectURL(blob);
-            var pwin=window.open(url,'_blank');
-            if(pwin){ setTimeout(function(){ pwin.print(); URL.revokeObjectURL(url); },800); }
-          }catch(e){}
-        },600);
-      }).catch(function(err){
-        if(document.body.contains(p2div)) document.body.removeChild(p2div);
-        if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
-        alert('PDF生成に失敗しました（P2）。\n'+err.message);
-      });
-    }).catch(function(err){
-      if(document.body.contains(p1div)) document.body.removeChild(p1div);
-      if(document.body.contains(p2div)) document.body.removeChild(p2div);
+      }
+      var now=new Date();
+      var dateStr=now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0');
+      var fname='teikiJunkai_jigyo'+(uNameI?'_'+uNameI:'')+'_'+(tMonthI||dateStr)+'.pdf';
+      fname=fname.replace(/[\s　]/g,'_');
       if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
-      alert('PDF生成に失敗しました（P1）。\n'+err.message);
+      try{ doc.save(fname); }
+      catch(e){ window.open(doc.output('datauristring'),'_blank'); }
+      setTimeout(function(){
+        try{
+          var blobI=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
+          var urlI=URL.createObjectURL(blobI);
+          var pwinI=window.open(urlI,'_blank');
+          if(pwinI){ setTimeout(function(){ pwinI.print(); },800); }
+          setTimeout(function(){ URL.revokeObjectURL(urlI); },3000);
+        }catch(e){}
+      },600);
+    }).catch(function(err){
+      if(document.body.contains(iDiv)) document.body.removeChild(iDiv);
+      if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
+      alert('PDF生成に失敗しました。\n'+err.message);
     });
-    return; /* 以降の通常処理はスキップ */
+    return;
+  }
+
+  /* ── 詳細コード版（simple）：コード表のみ1ページPDF ── */
+  if(_pvMode === 'simple'){
+    var codeSec=document.getElementById('pv-code-sec');
+    var svcElS=document.getElementById('serviceType');
+    var lvElS=document.getElementById('careLevel');
+    var uNameS=(document.getElementById('userName').value||'').trim();
+    var tMonthS=(document.getElementById('targetMonth').value||'').trim();
+    var stNameS=(document.getElementById('staffName').value||'').trim();
+    if(!codeSec){
+      if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
+      alert('先に計算を実行してから詳細コードタブを開いてください。');
+      return;
+    }
+    var codeDiv=document.createElement('div');
+    codeDiv.style.cssText='position:fixed;left:-9999px;top:0;width:'+sheetW+'px;background:#fff;padding:12px;font-family:sans-serif;';
+    var hdrS='<div style="font-size:11px;font-weight:700;color:#1a5fa8;border-bottom:2px solid #1a5fa8;padding-bottom:6px;margin-bottom:10px">'
+      +'定期巡回・随時対応型訪問介護看護　介護サービスコード一覧（令和6年度）'
+      +(uNameS?'<span style="font-size:9px;font-weight:400;color:#555;margin-left:10px">'+uNameS+'様</span>':'')
+      +(tMonthS?'<span style="font-size:9px;font-weight:400;color:#555;margin-left:8px">対象月：'+tMonthS+'</span>':'')
+      +(stNameS?'<span style="font-size:9px;font-weight:400;color:#555;margin-left:8px">担当：'+stNameS+'</span>':'')
+      +'<br><span style="font-size:8px;font-weight:400;color:#555;">'
+      +svcElS.options[svcElS.selectedIndex].text+'　'
+      +lvElS.options[lvElS.selectedIndex].text+'</span></div>';
+    codeDiv.innerHTML=hdrS+codeSec.outerHTML
+      +'<div style="background:#fffbe6;border:1px solid #e0c040;border-radius:5px;padding:7px 10px;font-size:8px;color:#665500;margin-top:10px"><strong>⚠ ご注意</strong>　概算計算です。</div>';
+    document.body.appendChild(codeDiv);
+    var optS={scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,
+              windowWidth:sheetW,windowHeight:codeDiv.scrollHeight};
+    html2canvas(codeDiv,optS).then(function(canvas){
+      document.body.removeChild(codeDiv);
+      var iW=canvas.width,iH=canvas.height;
+      var ratio=contentW/(iW/CANVAS_SCALE);
+      var scaledH=(iH/CANVAS_SCALE)*ratio;
+      var doc=new jsPDFLib({orientation:'portrait',unit:'mm',format:'a4'});
+      if(scaledH<=pageContentH){
+        doc.addImage(canvas.toDataURL('image/jpeg',0.93),'JPEG',margin,margin,contentW,scaledH);
+      } else {
+        var pageImgH=Math.floor(pageContentH/ratio*CANVAS_SCALE);
+        var oy=0;
+        while(oy<iH){
+          var sh2=Math.min(pageImgH,iH-oy);
+          var sc2=document.createElement('canvas');
+          sc2.width=iW; sc2.height=sh2;
+          sc2.getContext('2d').drawImage(canvas,0,oy,iW,sh2,0,0,iW,sh2);
+          if(oy>0) doc.addPage();
+          doc.addImage(sc2.toDataURL('image/jpeg',0.93),'JPEG',margin,margin,contentW,(sh2/CANVAS_SCALE)*ratio);
+          oy+=sh2;
+        }
+      }
+      var now=new Date();
+      var dateStr=now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0');
+      var fname='teikiJunkai_code'+(uNameS?'_'+uNameS:'')+'_'+(tMonthS||dateStr)+'.pdf';
+      fname=fname.replace(/[\s　]/g,'_');
+      if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
+      try{ doc.save(fname); }
+      catch(e){ window.open(doc.output('datauristring'),'_blank'); }
+      setTimeout(function(){
+        try{
+          var blobS=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
+          var urlS=URL.createObjectURL(blobS);
+          var pwinS=window.open(urlS,'_blank');
+          if(pwinS){ setTimeout(function(){ pwinS.print(); },800); }
+          setTimeout(function(){ URL.revokeObjectURL(urlS); },3000);
+        }catch(e){}
+      },600);
+    }).catch(function(err){
+      if(document.body.contains(codeDiv)) document.body.removeChild(codeDiv);
+      if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
+      alert('PDF生成に失敗しました。\n'+err.message);
+    });
+    return;
   }
 
   /* ── 簡易版・詳細版：従来の1ページ処理 ── */
@@ -1851,7 +1902,7 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
     var tMonth = (document.getElementById('targetMonth').value || '').trim();
     var now = new Date();
     var dateStr = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
-    var modeLabel = {simple:'kantan', detail:'syousai', invoice:'seikyusyo'}[_pvMode] || _pvMode;
+    var modeLabel = {simple:'code', detail:'syousai', invoice:'jigyo'}[_pvMode] || _pvMode;
     var fname = 'teikiJunkai_' + modeLabel + (uName ? '_'+uName : '') + '_' + (tMonth || dateStr) + '.pdf';
     fname = fname.replace(/[\s　]/g, '_');
     if(pvBtn){ pvBtn.textContent = origText; pvBtn.disabled = false; }
@@ -1859,10 +1910,13 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
     catch(e){ var dataUri = doc.output('datauristring'); window.open(dataUri, '_blank'); }
     /* PDF保存後に印刷ダイアログを開く */
     setTimeout(function(){
-      var blob2=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
-      var url2=URL.createObjectURL(blob2);
-      var pwin2=window.open(url2,'_blank');
-      if(pwin2){ setTimeout(function(){ pwin2.print(); URL.revokeObjectURL(url2); },800); }
+      try{
+        var blob2=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
+        var url2=URL.createObjectURL(blob2);
+        var pwin2=window.open(url2,'_blank');
+        if(pwin2){ setTimeout(function(){ pwin2.print(); },800); }
+        setTimeout(function(){ URL.revokeObjectURL(url2); },3000);
+      }catch(e){}
     },600);
   }).catch(function(err){
     if(pvBtn){ pvBtn.textContent = origText; pvBtn.disabled = false; }
@@ -2196,8 +2250,6 @@ document.addEventListener('DOMContentLoaded',function(){
   }
   var pdfBtn=document.querySelector('[data-action="savepdf"]');
   if(pdfBtn) onTap(pdfBtn,function(){savePDF();});
-  var printBtn=document.querySelector('[data-action="execprint"]');
-  if(printBtn) onTap(printBtn,function(){execPrint();});
   var closeBtn=document.querySelector('[data-action="close"]');
   if(closeBtn) onTap(closeBtn,function(){closePreview();});
   var allCbs=document.querySelectorAll('.cb-input');
