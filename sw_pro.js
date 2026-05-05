@@ -1,14 +1,26 @@
 /* =====================================================
    Service Worker — 定期巡回計算ツール PRO版
-   sw_pro.js
+   GitHub Pages対応版 sw_pro.js
    ===================================================== */
-var CACHE_NAME = 'teiki-pro-v3';
+var CACHE_NAME = 'teiki-pro-v4';
 var ASSETS = [
-  '/pro.vol.3/index_pro.html',
-  '/pro.vol.3/manifest_pro.json',
-  '/pro.vol.3/icon-180.png',
-  '/pro.vol.3/icon-192.png',
-  '/pro.vol.3/icon-512.png'
+  './',
+  './index.html',
+  './manifest_pro.json',
+  './icon-180.png',
+  './icon-192.png',
+  './icon-512.png',
+  './splash-iphone14pro.png',
+  './splash-iphone14pm.png',
+  './splash-iphone14.png',
+  './splash-iphone13pm.png',
+  './splash-iphone12m.png',
+  './splash-iphonex.png',
+  './splash-iphonexr.png',
+  './splash-iphone8.png',
+  './splash-ipadpro13.png',
+  './splash-ipadpro11.png',
+  './splash-ipad.png'
 ];
 
 /* インストール：キャッシュに登録 */
@@ -36,6 +48,8 @@ self.addEventListener('activate', function(e) {
 
 /* フェッチ：キャッシュ優先、なければネット */
 self.addEventListener('fetch', function(e) {
+  /* GETリクエストのみ対象 */
+  if (e.request.method !== 'GET') return;
   e.respondWith(
     caches.match(e.request).then(function(cached) {
       return cached || fetch(e.request).then(function(res) {
@@ -48,7 +62,7 @@ self.addEventListener('fetch', function(e) {
         return res;
       });
     }).catch(function() {
-      return caches.match('/pro.vol.3/index_pro.html');
+      return caches.match('./index.html');
     })
   );
 });
