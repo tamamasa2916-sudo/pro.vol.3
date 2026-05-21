@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="定期巡回計算 PRO">
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#5c3fc4">
-<meta name="description" content="定期巡回・随時対応型訪問介護看護 利用料 簡易計算ツール PRO版（令和6年度介護報酬改定対応）">
+<meta name="description" content="定期巡回・随時対応型訪問介護看護 利用料 簡易計算ツール PRO版（令和7年度 処遇改善加算改定対応）">
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest_pro.json">
 <!-- iOS ホーム画面アイコン
@@ -19,17 +19,17 @@
 <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon-precomposed" href="icon-180.png">
 <!-- iOS スプラッシュ画面 -->
-<link rel="apple-touch-startup-image" href="./splash-iphone14pro.png"  media="screen and (device-width:393px) and (device-height:852px) and (-webkit-device-pixel-ratio:3)">
-<link rel="apple-touch-startup-image" href="./splash-iphone14pm.png"   media="screen and (device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3)">
-<link rel="apple-touch-startup-image" href="./splash-iphone14.png"     media="screen and (device-width:390px) and (device-height:844px) and (-webkit-device-pixel-ratio:3)">
-<link rel="apple-touch-startup-image" href="./splash-iphone13pm.png"   media="screen and (device-width:428px) and (device-height:926px) and (-webkit-device-pixel-ratio:3)">
-<link rel="apple-touch-startup-image" href="./splash-iphone12m.png"    media="screen and (device-width:360px) and (device-height:780px) and (-webkit-device-pixel-ratio:3)">
-<link rel="apple-touch-startup-image" href="./splash-iphonex.png"      media="screen and (device-width:375px) and (device-height:812px) and (-webkit-device-pixel-ratio:3)">
-<link rel="apple-touch-startup-image" href="./splash-iphonexr.png"     media="screen and (device-width:414px) and (device-height:896px) and (-webkit-device-pixel-ratio:2)">
-<link rel="apple-touch-startup-image" href="./splash-iphone8.png"      media="screen and (device-width:375px) and (device-height:667px) and (-webkit-device-pixel-ratio:2)">
-<link rel="apple-touch-startup-image" href="./splash-ipadpro13.png"    media="screen and (device-width:1024px) and (device-height:1366px) and (-webkit-device-pixel-ratio:2)">
-<link rel="apple-touch-startup-image" href="./splash-ipadpro11.png"    media="screen and (device-width:834px) and (device-height:1194px) and (-webkit-device-pixel-ratio:2)">
-<link rel="apple-touch-startup-image" href="./splash-ipad.png"         media="screen and (device-width:810px) and (device-height:1080px) and (-webkit-device-pixel-ratio:2)">
+<link rel="apple-touch-startup-image" href="splash-iphone14pro.png"  media="screen and (device-width:393px) and (device-height:852px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="splash-iphone14pm.png"   media="screen and (device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="splash-iphone14.png"     media="screen and (device-width:390px) and (device-height:844px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="splash-iphone13pm.png"   media="screen and (device-width:428px) and (device-height:926px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="splash-iphone12m.png"    media="screen and (device-width:360px) and (device-height:780px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="splash-iphonex.png"      media="screen and (device-width:375px) and (device-height:812px) and (-webkit-device-pixel-ratio:3)">
+<link rel="apple-touch-startup-image" href="splash-iphonexr.png"     media="screen and (device-width:414px) and (device-height:896px) and (-webkit-device-pixel-ratio:2)">
+<link rel="apple-touch-startup-image" href="splash-iphone8.png"      media="screen and (device-width:375px) and (device-height:667px) and (-webkit-device-pixel-ratio:2)">
+<link rel="apple-touch-startup-image" href="splash-ipadpro13.png"    media="screen and (device-width:1024px) and (device-height:1366px) and (-webkit-device-pixel-ratio:2)">
+<link rel="apple-touch-startup-image" href="splash-ipadpro11.png"    media="screen and (device-width:834px) and (device-height:1194px) and (-webkit-device-pixel-ratio:2)">
+<link rel="apple-touch-startup-image" href="splash-ipad.png"         media="screen and (device-width:810px) and (device-height:1080px) and (-webkit-device-pixel-ratio:2)">
 <title>定期巡回 利用料計算 PRO</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap');
@@ -563,7 +563,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
 
 <div class="wrap">
 <header style="position:relative">
-  <div class="badge">📋 令和6年度介護報酬改定対応　PRO版</div>
+  <div class="badge">📋 令和7年度 処遇改善加算改定対応　PRO版</div>
   <h1>定期巡回・随時対応型<br>訪問介護看護<small>利用料 簡易計算ツール</small></h1>
   <button type="button" class="full-reset-btn" data-action="fullreset" style="position:absolute;top:0;right:0">🔄 全リセット</button>
 </header>
@@ -751,20 +751,22 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
 <!-- ④処遇改善加算 -->
 <div class="card">
   <div class="card-head"><div class="num n-teal">④</div><div class="card-title">処遇改善加算</div></div>
-  <div class="shogai-box"><strong>計算方法</strong><br>加減算後の総単位数×加算率　Ⅰ＝24.5%　Ⅱ＝22.4%　Ⅲ＝18.2%　Ⅳ＝14.5%</div>
+  <div class="shogai-box"><strong>計算方法</strong><br>加減算後の総単位数×加算率　Ⅰイ＝26.7%　Ⅰロ＝27.8%　Ⅱイ＝24.6%　Ⅱロ＝25.7%　Ⅲ＝20.4%　Ⅳ＝16.7%</div>
   <div class="fg"><label class="fl">処遇改善加算の区分</label>
     <select id="shokaigo">
       <option value="0">なし</option>
-      <option value="0.245">処遇改善加算（Ⅰ） ＋24.5%</option>
-      <option value="0.224">処遇改善加算（Ⅱ） ＋22.4%</option>
-      <option value="0.182">処遇改善加算（Ⅲ） ＋18.2%</option>
-      <option value="0.145">処遇改善加算（Ⅳ） ＋14.5%</option>
+      <option value="0.267">処遇改善加算（Ⅰイ） ＋26.7%【標準型】</option>
+      <option value="0.278">処遇改善加算（Ⅰロ） ＋27.8%【生産性向上型】</option>
+      <option value="0.246">処遇改善加算（Ⅱイ） ＋24.6%【標準型】</option>
+      <option value="0.257">処遇改善加算（Ⅱロ） ＋25.7%【生産性向上型】</option>
+      <option value="0.204">処遇改善加算（Ⅲ） ＋20.4%</option>
+      <option value="0.167">処遇改善加算（Ⅳ） ＋16.7%</option>
     </select>
   </div>
 </div>
 
 <!-- ⑤日割り -->
-<input type="hidden" id="monthDays" value="30">
+<input type="hidden" id="monthDays" value="31">
 <div class="card">
   <div class="card-head"><div class="num n-green">⑤</div><div class="card-title">日割り計算</div></div>
   <div class="fg">
@@ -866,7 +868,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('./sw_pro.js', { scope: './' }).then(function(reg) {
+    navigator.serviceWorker.register('/pro.vol.3/sw_pro.js', { scope: '/pro.vol.3/' }).then(function(reg) {
       console.log('[PWA] Service Worker 登録完了:', reg.scope);
       reg.onupdatefound = function() {
         var newWorker = reg.installing;
@@ -948,8 +950,8 @@ var BASE_CODE={
   integrated_nursing:   {1:'761211',2:'761221',3:'761231',4:'761241',5:'761251'},
   cooperation:          {1:'762111',2:'762121',3:'762131',4:'762141',5:'762151'}
 };
-var SHOKAI_CODE={'0':'','0.245':'766114','0.224':'766112','0.182':'766104','0.145':'766380'};
-var SHOKAI_LABEL={'0.245':'処遇改善加算（Ⅰ）','0.224':'処遇改善加算（Ⅱ）','0.182':'処遇改善加算（Ⅲ）','0.145':'処遇改善加算（Ⅳ）'};
+var SHOKAI_CODE={'0':'','0.267':'766114','0.278':'766115','0.246':'766112','0.257':'766113','0.204':'766104','0.167':'766106'};
+var SHOKAI_LABEL={'0.267':'処遇改善加算（Ⅰイ）標準型','0.278':'処遇改善加算（Ⅰロ）生産性向上型','0.246':'処遇改善加算（Ⅱイ）標準型','0.257':'処遇改善加算（Ⅱロ）生産性向上型','0.204':'処遇改善加算（Ⅲ）','0.167':'処遇改善加算（Ⅳ）'};
 var _lastSteps=[];
 var _pvMode='simple';
 var _scrollY=0;
@@ -1385,7 +1387,7 @@ function fullReset(){
 }
 
 function escHtml(s){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function buildSheetHTML(mode){
@@ -1809,6 +1811,15 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
         fname=fname.replace(/[\s　]/g,'_');
         if(pvBtn){pvBtn.textContent=origText;pvBtn.disabled=false;}
         try{doc.save(fname);}catch(e){window.open(doc.output('datauristring'),'_blank');}
+        setTimeout(function(){
+          try{
+            var bI=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
+            var uI=URL.createObjectURL(bI);
+            var pI=window.open(uI,'_blank');
+            if(pI){setTimeout(function(){pI.print();},800);}
+            setTimeout(function(){URL.revokeObjectURL(uI);},3000);
+          }catch(e){}
+        },600);
       }).catch(function(err){
         if(document.body.contains(iDiv2)) document.body.removeChild(iDiv2);
         if(pvBtn){pvBtn.textContent=origText;pvBtn.disabled=false;}
@@ -1823,13 +1834,36 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
     return;
   }
 
-  /* ── 詳細コード版（simple）：pv-sheet をそのままPDF化 ── */
+  /* ── 詳細コード版（simple）：コード表のみ1ページPDF ── */
   if(_pvMode === 'simple'){
+    var codeSec=document.getElementById('pv-code-sec');
+    var svcElS=document.getElementById('serviceType');
+    var lvElS=document.getElementById('careLevel');
     var uNameS=(document.getElementById('userName').value||'').trim();
     var tMonthS=(document.getElementById('targetMonth').value||'').trim();
+    var stNameS=(document.getElementById('staffName').value||'').trim();
+    if(!codeSec){
+      if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
+      alert('先に計算を実行してから詳細コードタブを開いてください。');
+      return;
+    }
+    var codeDiv=document.createElement('div');
+    codeDiv.style.cssText='position:fixed;left:-9999px;top:0;width:'+sheetW+'px;background:#fff;padding:12px;font-family:sans-serif;';
+    var hdrS='<div style="font-size:11px;font-weight:700;color:#1a5fa8;border-bottom:2px solid #1a5fa8;padding-bottom:6px;margin-bottom:10px">'
+      +'定期巡回・随時対応型訪問介護看護　介護サービスコード一覧'
+      +(uNameS?'<span style="font-size:9px;font-weight:400;color:#555;margin-left:10px">'+uNameS+'様</span>':'')
+      +(tMonthS?'<span style="font-size:9px;font-weight:400;color:#555;margin-left:8px">対象月：'+tMonthS+'</span>':'')
+      +(stNameS?'<span style="font-size:9px;font-weight:400;color:#555;margin-left:8px">担当：'+stNameS+'</span>':'')
+      +'<br><span style="font-size:8px;font-weight:400;color:#555;">'
+      +svcElS.options[svcElS.selectedIndex].text+'　'
+      +lvElS.options[lvElS.selectedIndex].text+'</span></div>';
+    codeDiv.innerHTML=hdrS+codeSec.outerHTML
+      +'<div style="background:#fffbe6;border:1px solid #e0c040;border-radius:5px;padding:7px 10px;font-size:8px;color:#665500;margin-top:10px"><strong>⚠ ご注意</strong>　概算計算です。</div>';
+    document.body.appendChild(codeDiv);
     var optS={scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false,
-              windowWidth:sheetW,windowHeight:sheet.scrollHeight};
-    html2canvas(sheet,optS).then(function(canvas){
+              windowWidth:sheetW,windowHeight:codeDiv.scrollHeight};
+    html2canvas(codeDiv,optS).then(function(canvas){
+      document.body.removeChild(codeDiv);
       var iW=canvas.width,iH=canvas.height;
       var ratio=contentW/(iW/CANVAS_SCALE);
       var scaledH=(iH/CANVAS_SCALE)*ratio;
@@ -1856,7 +1890,17 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
       if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
       try{ doc.save(fname); }
       catch(e){ window.open(doc.output('datauristring'),'_blank'); }
+      setTimeout(function(){
+        try{
+          var blobS=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
+          var urlS=URL.createObjectURL(blobS);
+          var pwinS=window.open(urlS,'_blank');
+          if(pwinS){ setTimeout(function(){ pwinS.print(); },800); }
+          setTimeout(function(){ URL.revokeObjectURL(urlS); },3000);
+        }catch(e){}
+      },600);
     }).catch(function(err){
+      if(document.body.contains(codeDiv)) document.body.removeChild(codeDiv);
       if(pvBtn){ pvBtn.textContent=origText; pvBtn.disabled=false; }
       alert('PDF生成に失敗しました。\n'+err.message);
     });
@@ -1899,6 +1943,16 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
     if(pvBtn){ pvBtn.textContent = origText; pvBtn.disabled = false; }
     try{ doc.save(fname); }
     catch(e){ var dataUri = doc.output('datauristring'); window.open(dataUri, '_blank'); }
+    /* PDF保存後に印刷ダイアログを開く */
+    setTimeout(function(){
+      try{
+        var blob2=new Blob([doc.output('arraybuffer')],{type:'application/pdf'});
+        var url2=URL.createObjectURL(blob2);
+        var pwin2=window.open(url2,'_blank');
+        if(pwin2){ setTimeout(function(){ pwin2.print(); },800); }
+        setTimeout(function(){ URL.revokeObjectURL(url2); },3000);
+      }catch(e){}
+    },600);
   }).catch(function(err){
     if(pvBtn){ pvBtn.textContent = origText; pvBtn.disabled = false; }
     alert('PDF生成に失敗しました。\n' + err.message);
@@ -1907,7 +1961,7 @@ function doGeneratePDF(jsPDFLib, pvBtn, origText){
 
 /* ── 種別による加算制限制御 ── */
 var NURSING_ONLY_GROUPS=['nursing','tokubetsu'];
-var NURSING_ONLY_CBS=['c17','c25']; /* ターミナルケアマネジメント加算・准看護師減算 */
+var NURSING_ONLY_CBS=['c17']; /* ターミナルケアマネジメント加算 */
 
 function updateAddonAvailability(){
   var svc=document.getElementById('serviceType').value;
@@ -1966,11 +2020,11 @@ function updateAddonAvailability(){
   var shogaiBox=document.querySelector('.shogai-box');
   if(shogaiBox){
     if(isNursing){
-      shogaiBox.innerHTML='<strong>計算方法（一体型・看護あり）</strong><br>加減算後の総単位数×加算率　Ⅰ＝24.5%　Ⅱ＝22.4%　Ⅲ＝18.2%　Ⅳ＝14.5%';
+      shogaiBox.innerHTML='<strong>計算方法（一体型・看護あり）</strong><br>加減算後の総単位数×加算率　Ⅰイ＝26.7%　Ⅰロ＝27.8%　Ⅱイ＝24.6%　Ⅱロ＝25.7%　Ⅲ＝20.4%　Ⅳ＝16.7%';
     } else if(svc==='integrated_no_nursing'){
-      shogaiBox.innerHTML='<strong>計算方法（一体型・看護なし）</strong><br>加減算後の総単位数×加算率　Ⅰ＝24.5%　Ⅱ＝22.4%　Ⅲ＝18.2%　Ⅳ＝14.5%';
+      shogaiBox.innerHTML='<strong>計算方法（一体型・看護なし）</strong><br>加減算後の総単位数×加算率　Ⅰイ＝26.7%　Ⅰロ＝27.8%　Ⅱイ＝24.6%　Ⅱロ＝25.7%　Ⅲ＝20.4%　Ⅳ＝16.7%';
     } else {
-      shogaiBox.innerHTML='<strong>計算方法（連携型）</strong><br>加減算後の総単位数×加算率　Ⅰ＝24.5%　Ⅱ＝22.4%　Ⅲ＝18.2%　Ⅳ＝14.5%';
+      shogaiBox.innerHTML='<strong>計算方法（連携型）</strong><br>加減算後の総単位数×加算率　Ⅰイ＝26.7%　Ⅰロ＝27.8%　Ⅱイ＝24.6%　Ⅱロ＝25.7%　Ⅲ＝20.4%　Ⅳ＝16.7%';
     }
   }
 
