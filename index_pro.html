@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="定期巡回計算 PRO">
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#5c3fc4">
-<meta name="description" content="定期巡回・随時対応型訪問介護看護 利用料 簡易計算ツール PRO版（令和6年度介護報酬改定対応）">
+<meta name="description" content="定期巡回・随時対応型訪問介護看護 利用料 簡易計算ツール PRO版（令和7年度 処遇改善加算改定対応）">
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest_pro.json">
 <!-- iOS ホーム画面アイコン
@@ -563,7 +563,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
 
 <div class="wrap">
 <header style="position:relative">
-  <div class="badge">📋 令和6年度介護報酬改定対応　PRO版</div>
+  <div class="badge">📋 令和7年度 処遇改善加算改定対応　PRO版</div>
   <h1>定期巡回・随時対応型<br>訪問介護看護<small>利用料 簡易計算ツール</small></h1>
   <button type="button" class="full-reset-btn" data-action="fullreset" style="position:absolute;top:0;right:0">🔄 全リセット</button>
 </header>
@@ -751,14 +751,16 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
 <!-- ④処遇改善加算 -->
 <div class="card">
   <div class="card-head"><div class="num n-teal">④</div><div class="card-title">処遇改善加算</div></div>
-  <div class="shogai-box"><strong>計算方法</strong><br>加減算後の総単位数×加算率　Ⅰ＝24.5%　Ⅱ＝22.4%　Ⅲ＝18.2%　Ⅳ＝14.5%</div>
+  <div class="shogai-box"><strong>計算方法</strong><br>加減算後の総単位数×加算率　Ⅰイ＝26.7%　Ⅰロ＝27.8%　Ⅱイ＝24.6%　Ⅱロ＝25.7%　Ⅲ＝20.4%　Ⅳ＝16.7%</div>
   <div class="fg"><label class="fl">処遇改善加算の区分</label>
     <select id="shokaigo">
       <option value="0">なし</option>
-      <option value="0.245">処遇改善加算（Ⅰ） ＋24.5%</option>
-      <option value="0.224">処遇改善加算（Ⅱ） ＋22.4%</option>
-      <option value="0.182">処遇改善加算（Ⅲ） ＋18.2%</option>
-      <option value="0.145">処遇改善加算（Ⅳ） ＋14.5%</option>
+      <option value="0.267">処遇改善加算（Ⅰイ） ＋26.7%【標準型】</option>
+      <option value="0.278">処遇改善加算（Ⅰロ） ＋27.8%【生産性向上型】</option>
+      <option value="0.246">処遇改善加算（Ⅱイ） ＋24.6%【標準型】</option>
+      <option value="0.257">処遇改善加算（Ⅱロ） ＋25.7%【生産性向上型】</option>
+      <option value="0.204">処遇改善加算（Ⅲ） ＋20.4%</option>
+      <option value="0.167">処遇改善加算（Ⅳ） ＋16.7%</option>
     </select>
   </div>
 </div>
@@ -948,8 +950,8 @@ var BASE_CODE={
   integrated_nursing:   {1:'761211',2:'761221',3:'761231',4:'761241',5:'761251'},
   cooperation:          {1:'762111',2:'762121',3:'762131',4:'762141',5:'762151'}
 };
-var SHOKAI_CODE={'0':'','0.245':'766114','0.224':'766112','0.182':'766104','0.145':'766380'};
-var SHOKAI_LABEL={'0.245':'処遇改善加算（Ⅰ）','0.224':'処遇改善加算（Ⅱ）','0.182':'処遇改善加算（Ⅲ）','0.145':'処遇改善加算（Ⅳ）'};
+var SHOKAI_CODE={'0':'','0.267':'766114','0.278':'766115','0.246':'766112','0.257':'766113','0.204':'766104','0.167':'766106'};
+var SHOKAI_LABEL={'0.267':'処遇改善加算（Ⅰイ）標準型','0.278':'処遇改善加算（Ⅰロ）生産性向上型','0.246':'処遇改善加算（Ⅱイ）標準型','0.257':'処遇改善加算（Ⅱロ）生産性向上型','0.204':'処遇改善加算（Ⅲ）','0.167':'処遇改善加算（Ⅳ）'};
 var _lastSteps=[];
 var _pvMode='simple';
 var _scrollY=0;
@@ -2018,11 +2020,11 @@ function updateAddonAvailability(){
   var shogaiBox=document.querySelector('.shogai-box');
   if(shogaiBox){
     if(isNursing){
-      shogaiBox.innerHTML='<strong>計算方法（一体型・看護あり）</strong><br>加減算後の総単位数×加算率　Ⅰ＝24.5%　Ⅱ＝22.4%　Ⅲ＝18.2%　Ⅳ＝14.5%';
+      shogaiBox.innerHTML='<strong>計算方法（一体型・看護あり）</strong><br>加減算後の総単位数×加算率　Ⅰイ＝26.7%　Ⅰロ＝27.8%　Ⅱイ＝24.6%　Ⅱロ＝25.7%　Ⅲ＝20.4%　Ⅳ＝16.7%';
     } else if(svc==='integrated_no_nursing'){
-      shogaiBox.innerHTML='<strong>計算方法（一体型・看護なし）</strong><br>加減算後の総単位数×加算率　Ⅰ＝24.5%　Ⅱ＝22.4%　Ⅲ＝18.2%　Ⅳ＝14.5%';
+      shogaiBox.innerHTML='<strong>計算方法（一体型・看護なし）</strong><br>加減算後の総単位数×加算率　Ⅰイ＝26.7%　Ⅰロ＝27.8%　Ⅱイ＝24.6%　Ⅱロ＝25.7%　Ⅲ＝20.4%　Ⅳ＝16.7%';
     } else {
-      shogaiBox.innerHTML='<strong>計算方法（連携型）</strong><br>加減算後の総単位数×加算率　Ⅰ＝24.5%　Ⅱ＝22.4%　Ⅲ＝18.2%　Ⅳ＝14.5%';
+      shogaiBox.innerHTML='<strong>計算方法（連携型）</strong><br>加減算後の総単位数×加算率　Ⅰイ＝26.7%　Ⅰロ＝27.8%　Ⅱイ＝24.6%　Ⅱロ＝25.7%　Ⅲ＝20.4%　Ⅳ＝16.7%';
     }
   }
 
