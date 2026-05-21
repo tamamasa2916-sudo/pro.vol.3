@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#5c3fc4">
 <meta name="description" content="定期巡回・随時対応型訪問介護看護 利用料 簡易計算ツール PRO版（令和7年度 処遇改善加算改定対応）">
 <!-- PWA manifest -->
-<link rel="manifest" href="manifest_pro.json">
+<link rel="manifest" href="manifest.json">
 <!-- iOS ホーム画面アイコン
      iOSはmanifestのiconsを無視 → apple-touch-iconが必須
      180x180がiPhone最新機種の標準サイズ・RGB（透明なし）が必須 -->
@@ -868,7 +868,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:13px 0}
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/pro.vol.3/sw_pro.js', { scope: '/pro.vol.3/' }).then(function(reg) {
+    navigator.serviceWorker.register('/tamamasa2916/sw.js', { scope: '/tamamasa2916/' }).then(function(reg) {
       console.log('[PWA] Service Worker 登録完了:', reg.scope);
       reg.onupdatefound = function() {
         var newWorker = reg.installing;
